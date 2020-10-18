@@ -1,0 +1,6 @@
+{
+    "require": {
+        "alexoliverwd/brace": "^1.0",
+        "scssphp/scssphp": "^1.2"
+    }
+}
