@@ -15,4 +15,14 @@
 
     /** Move Yoast SEO metabox to bottom of posts */
     add_filter( 'wpseo_metabox_prio', function() {return 'low';});
+
+    /**
+     * Remove absolute paths of post content.
+     * This WP Filter triggers before post is saved.
+     */
+    add_filter( 'wp_insert_post_data' , 'filter_post_data' , '99', 2);
+    function filter_post_data($data){
+        $data['post_content'] = str_replace(get_site_url().'/', '/', $data['post_content']);
+        return $data;
+    }
 ?>

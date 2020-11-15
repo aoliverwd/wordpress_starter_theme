@@ -1,0 +1,3 @@
+<?php
+    Theme\View\render();
+?>
