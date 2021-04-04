@@ -6,7 +6,8 @@
     <title>Document</title>
 </head>
 <body>
-
+    {{assets->css}}
     <header>
         <h1>Header</h1>
     </header>
+    {{assets->js}}

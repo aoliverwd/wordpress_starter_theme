@@ -10,6 +10,9 @@
     const compiled_assets_path = __DIR__.'/cached/';
     const admin_path = __DIR__.'/admin/';
 
+    /** Global array of static assets that are loaded */
+    $GLOBALS['theme_settings_id'] = [];
+
     /** Load dependencies */
     include_once theme_path.'/vendor/autoload.php';
     include_once include_path.'security.php';
