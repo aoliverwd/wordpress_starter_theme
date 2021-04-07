@@ -10,6 +10,7 @@
     const compiled_assets_path = __DIR__.'/cached/';
     const blocks_path = __DIR__.'/blocks/';
     const admin_path = __DIR__.'/admin/';
+    const assets_path = __DIR__.'/assets/';
 
     /** Global array of static assets that are loaded */
     $GLOBALS['theme_settings_id'] = [];

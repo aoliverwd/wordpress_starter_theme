@@ -6,6 +6,11 @@
         __DIR__.'/header.js'
     ]);
 
+    // Critical assets
+    $critical_assets = Theme\Functions\cache_static_assets([
+        \Theme\assets_path.'css/core.scss',
+    ]);
+
     //yoast
     ob_start();
     do_action('wpseo_head');
@@ -22,7 +27,10 @@
         'charset' => get_bloginfo('charset'),
         'lang' => get_bloginfo('language'),
         'title' => get_bloginfo('name'), //wp_title(' - ', false)
-        'assets' => $assets,
+        'assets' => [
+            'header' => $assets,
+            'critical' => $critical_assets
+        ],
         'yoast' => $yoast,
         'navigation' => [
             'main' => Theme\Functions\return_navigation('Main Navigation'),

@@ -12,9 +12,11 @@
 
     <!-- yoast meta -->
     {{yoast}}
+
+    {{assets->critical->css}}
 </head>
 <body>
-    {{assets->css}}
+    {{assets->header->css}}
     <header>
         <h1>Header</h1>
 
