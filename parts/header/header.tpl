@@ -1,9 +1,17 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="{{lang}}">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <!-- Char set -->
+    <meta charset="{{charset}}"/>
+
+    <!-- Browser scale -->
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=10, user-scalable=yes"/>
+
+    <!-- Title -->
+    <title>{{title}}</title>
+
+    <!-- yoast meta -->
+    {{yoast}}
 </head>
 <body>
     {{assets->css}}
@@ -11,3 +19,14 @@
         <h1>Header</h1>
     </header>
     {{assets->js}}
+
+    <main>
+
+        <!-- no script message -->
+        <noscript>
+            <div id="no_script">
+                <div class="wrap">
+                    <p><strong>Please enable JavaScript</strong> This site will not function correctly without JavaScript enabled.</p>
+                </div>
+            </div>
+        </noscript>
