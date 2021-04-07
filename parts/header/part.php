@@ -19,6 +19,9 @@
         'lang' => get_bloginfo('language'),
         'title' => get_bloginfo('name'), //wp_title(' - ', false)
         'assets' => $assets,
-        'yoast' => $yoast
+        'yoast' => $yoast,
+        'navigation' => [
+            'main' => Theme\Functions\return_navigation('Main Navigation'),
+        ],
     ]);
 ?>

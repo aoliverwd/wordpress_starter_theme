@@ -17,6 +17,26 @@
     {{assets->css}}
     <header>
         <h1>Header</h1>
+
+        {{if navigation->main EXISTS}}
+            <nav>
+            {{each navigation->main}}
+                {{if subnav EXISTS}}
+                <span>
+                    <button type="button" class="{{class}} item">{{title}}<span>&nbsp;</span></button>
+                    <div class="subnav">
+                        {{each subnav}}
+                            <a href="{{url}}" class="{{class}}" target="{{target || _self}}" rel="noreferrer noopener">{{title}}</a>
+                        {{end}}
+                    </div>
+                </span>
+                {{else}}
+                <a href="{{url}}" class="{{class}} item" target="{{target || _self}}" rel="noreferrer noopener">{{title}}</a>
+                {{end}}
+
+            {{end}}
+            </nav>
+        {{end}}
     </header>
     {{assets->js}}
 

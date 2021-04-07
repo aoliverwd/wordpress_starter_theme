@@ -287,4 +287,42 @@
             }
         }
     }
+
+    //return navigation
+    function return_navigation(string $nav_title){
+        if($menu = wp_get_nav_menu_items($nav_title)){
+
+            $url = (isset($_SERVER['SCRIPT_URL']) ? $_SERVER['SCRIPT_URL'] : $_SERVER['REQUEST_URI']);
+
+            $slugs = explode('/', substr($url, 1));
+            $this_page_slug = $slugs[0];
+            $site_url = get_site_url();
+            $nav_items = [];
+
+            foreach($menu as $item){
+
+                $item->url_processed = substr(str_replace($site_url, '', $item->url), 1);
+                $item->url_processed = (substr($item->url_processed, -1) === '/' ? substr($item->url_processed, 0, -1) : $item->url_processed);
+
+                $item->url = str_replace(get_site_url().'/', '/', $item->url);
+
+                //add class
+                $item->class = ($item->url_processed === $this_page_slug ? 'selected' : 'not_selected');
+
+                //is child
+                if($item->menu_item_parent){
+                    $item->class = ($item->url_processed === rtrim(implode('/', $slugs), '/') ? 'selected' : 'not_selected');
+                    $nav_items[$item->menu_item_parent]->subnav[] = $item;
+                } else {
+                    //sub nav
+                    $item->subnav = [];
+
+                    //add to nav items
+                    $nav_items[$item->ID] = $item;
+                }
+            }
+
+            return json_decode(json_encode($nav_items), true);
+        }
+    }
 ?>
