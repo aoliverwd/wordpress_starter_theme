@@ -11,6 +11,10 @@
     do_action('wpseo_head');
     $yoast = ob_get_clean();
 
+    // ob_start();
+    // wp_head();
+    // $wp_header = ob_get_clean();
+
     /** Render template */
     $brace = new brace\parser;
     $brace->template_path = __DIR__.'/';
