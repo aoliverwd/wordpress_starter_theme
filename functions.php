@@ -8,6 +8,7 @@
     const include_path = __DIR__.'/includes/';
     const parts_path = __DIR__.'/parts/';
     const compiled_assets_path = __DIR__.'/cached/';
+    const blocks_path = __DIR__.'/blocks/';
     const admin_path = __DIR__.'/admin/';
 
     /** Global array of static assets that are loaded */
@@ -22,7 +23,7 @@
     include_once include_path.'wp-actions.php';
     include_once include_path.'wp-shortcodes.php';
 
-    /** Is WordPress admin area */
+    /** Is WordPress administration area */
     if(is_admin()){
         include_once admin_path.'admin.php';
     }

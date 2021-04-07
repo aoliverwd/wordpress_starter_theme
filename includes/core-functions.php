@@ -5,28 +5,35 @@
      */
     namespace Theme\Functions;
     use \ScssPhp\ScssPhp\Compiler;
-    
+    use \Theme as Theme;
+
     /** Return theme settings */
-    function return_theme_settings(){
-        if($theme_settings = get_option(\Theme\theme_settings_id)){
-            return json_decode($theme_settings, true);
-        }
-    }
+    // function return_theme_settings(){
+    //     if($theme_settings = get_option(Theme\theme_settings_id)){
+    //         return json_decode($theme_settings, true);
+    //     }
+    // }
 
     /** return theme setting */
-    function theme_setting(string $setting_name):bool{
-        return true;
+    function theme_setting(string $setting_name){
+
+        $settings = [
+            'asset_max_kb' => 2,
+            'dev_mode' => getenv('ENVIRONMENT') ?? 'development'
+        ];
+
+        return (isset($settings[$setting_name]) ? $settings[$setting_name] : false);
     }
 
     /** Cache static asset */
     function cache_static_assets(array $files_to_cache){
 
         /** Get theme settings */
-        $settings = return_theme_settings();
+        //$settings = return_theme_settings();
 
         /** Return cached ID location */
         $cache_id = check_for_cached_version(hash('crc32b', implode(',', $files_to_cache)));
-        
+
         $asset_types = [
             'css' => [],
             'js' => []
@@ -55,10 +62,10 @@
 
     /** Compile static asset */
     function compile_static_asset(array $assets, string $cache_id, string $extension):string {
-        
+
         /** Compiled asset filename */
         $asset_file = $cache_id.$extension;
-        
+
         /** Compile file */
         if(!file_exists($asset_file)){
 
@@ -98,17 +105,17 @@
             }
         }
 
-        if(file_exists($asset_file) && !isset($GLOBALS[\Theme\theme_settings_id][$asset_file])){
+        if(file_exists($asset_file) && !isset($GLOBALS[Theme\theme_settings_id][$asset_file])){
             /** Add to global loaded asset array */
-            $GLOBALS[\Theme\theme_settings_id][$asset_file] = true;
-            
+            $GLOBALS[Theme\theme_settings_id][$asset_file] = true;
+
             /** Get filesize in KB */
             $file_kb = number_format(filesize($asset_file) / 1024, 2);
 
             /** Get asset max size preference from settings */
             $kb_setting = theme_setting('asset_max_kb');
 
-            if($file_kb <= '2'){
+            if($file_kb <= $kb_setting){
                 switch($extension){
                 case '.css':
                     $asset_file = '<style>'.file_get_contents($asset_file).'</style>';
@@ -125,7 +132,7 @@
                 case '.js':
                     '<script src="'.return_file_uri_path($asset_file).'" defer></script>';
                     break;
-                }   
+                }
             }
 
             return $asset_file;
@@ -136,11 +143,11 @@
 
     /** Return file URI path */
     function return_file_uri_path(string $file_name):string{
-        
+
         /** Get WP content dir name */
         $content_dir = explode('/', WP_CONTENT_DIR);
         $content_dir_name = array_pop($content_dir);
-        
+
         /** URI relative path */
         $uri_folder = '/';
 
@@ -168,27 +175,27 @@
             return str_replace(['  ', ' }', ' {',': '],['', '}','{',':'], $round_one);
             break;
         case 'js':
-            $round_one = preg_replace('/\/\*(.*?)\*\/|\/\/(.*?)$/ms', '', $input_string);   
-            return $round_one; 
+            $round_one = preg_replace('/\/\*(.*?)\*\/|\/\/(.*?)$/ms', '', $input_string);
+            return $round_one;
             break;
         }
-        
+
         return $input_string;
     }
 
     /** return cached filename */
     function check_for_cached_version(string $identifier):string{
-        if(is_dir(\Theme\compiled_assets_path)){
+        if(is_dir(Theme\compiled_assets_path)){
 
-            $compiled_path = \Theme\compiled_assets_path;
+            $compiled_path = Theme\compiled_assets_path;
             $compile_index_file = $compiled_path.'compile-index.json';
             $compile_index = (file_exists($compile_index_file) ? json_decode(file_get_contents($compile_index_file), true) : []);
-            
+
             if(isset($compile_index[$identifier])){
 
                 /** Check dev mode status */
-                if(theme_setting('dev_mode')){
-                    
+                if(theme_setting('dev_mode') === 'development'){
+
                     /** Remove old compiled file */
                     foreach(['.css', '.js'] as $extension){
                         $old_compiled_file = $compiled_path.$identifier.'-'.$compile_index[$identifier].$extension;
@@ -225,9 +232,58 @@
     /** Load section */
     function load_parts(array $theme_parts){
         foreach($theme_parts as $part_name){
-           $part_file = \Theme\parts_path.$part_name.'/part.php';
+           $part_file = Theme\parts_path.$part_name.'/part.php';
             if(file_exists($part_file)){
                 include $part_file;
+            }
+        }
+    }
+
+    /** Load blocks */
+    function load_post_blocks(int $post_id){
+        if($blocks = parse_blocks(get_post_field('post_content', $post_id))){
+            foreach($blocks as $this_block){
+
+                /** is resealable block */
+                if(isset($this_block['attrs']['ref'])){
+                    if($block_post = get_post($this_block['attrs']['ref'])){
+                        $this_blocks = parse_blocks($block_post->post_content);
+                        $this_block = $this_blocks[0];
+                    }
+                }
+
+                load_block($this_block);
+            }
+        }
+    }
+
+    /** Load block */
+    function load_block(array $block){
+        if(is_array($block) && isset($block['blockName']) && $block['blockName']){
+
+            $blocks_classes = (isset($block['attrs']['className']) ? explode(' ', $block['attrs']['className']) : []);
+            $blocks_class_id = (count($blocks_classes) > 0 && strlen($blocks_classes[0]) > 0 ? Theme\Theme\blocks_path.trim($blocks_classes[0]).'/block.php' : false);
+            $default_block = (file_exists($blocks_class_id) ? $blocks_class_id : false);
+
+
+            $block['block_id'] = str_replace('/', '-', $block['blockName']);
+            $block_name_ids = explode('/', $block['blockName']);
+
+            $theme_block = Theme\blocks_path.$block['block_id'].'/block.php';
+
+            //$default_block = ($default_block ? $default_block : Theme\blocks_path.$block['block_id'].'/block.php');
+            $default_block = ($default_block ? $default_block : Theme\blocks_path.'default/block.php');
+
+            //block lab
+            $theme_block = ($block_name_ids[0] === 'block-lab' ? Theme\blocks_path.$block_name_ids[1].'/block.php' : $theme_block);
+
+            $block_file = (file_exists($theme_block) ? $theme_block : (file_exists($default_block) ? $default_block : false));
+
+            $block['theme_block_path'] = $block_file;
+            $block['theme_block_file_exists'] = file_exists($block_file);
+
+            if($block_file){
+                include $block_file;
             }
         }
     }
