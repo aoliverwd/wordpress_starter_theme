@@ -23,6 +23,7 @@
     include_once include_path.'wp-filters.php';
     include_once include_path.'wp-actions.php';
     include_once include_path.'wp-shortcodes.php';
+    include_once include_path.'block-patterns.php';
 
     /** Is WordPress administration area */
     if(is_admin()){
