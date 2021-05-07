@@ -8,20 +8,23 @@
     "packages": [
         {
             "name": "alexoliverwd/brace",
-            "version": "v1.0.3",
+            "version": "v1.0.6",
             "source": {
                 "type": "git",
                 "url": "https://github.com/aoliverwd/brace.git",
-                "reference": "b404469cd70b4d1fddeb010bff1efeb6cb87888f"
+                "reference": "e35df8a27e0b717cbfc3102c3dcc1fd502a2cc51"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/aoliverwd/brace/zipball/b404469cd70b4d1fddeb010bff1efeb6cb87888f",
-                "reference": "b404469cd70b4d1fddeb010bff1efeb6cb87888f",
+                "url": "https://api.github.com/repos/aoliverwd/brace/zipball/e35df8a27e0b717cbfc3102c3dcc1fd502a2cc51",
+                "reference": "e35df8a27e0b717cbfc3102c3dcc1fd502a2cc51",
                 "shasum": ""
             },
             "require": {
                 "php": ">=7.4"
+            },
+            "require-dev": {
+                "phpstan/phpstan": "^0.12.82"
             },
             "type": "library",
             "autoload": {
@@ -49,7 +52,11 @@
                 "html",
                 "template"
             ],
-            "time": "2020-12-23T15:08:29+00:00"
+            "support": {
+                "issues": "https://github.com/aoliverwd/brace/issues",
+                "source": "https://github.com/aoliverwd/brace/tree/v1.0.6"
+            },
+            "time": "2021-05-02T23:04:25+00:00"
         },
         {
             "name": "scssphp/scssphp",
@@ -112,6 +119,10 @@
                 "scss",
                 "stylesheet"
             ],
+            "support": {
+                "issues": "https://github.com/scssphp/scssphp/issues",
+                "source": "https://github.com/scssphp/scssphp/tree/v1.4.1"
+            },
             "time": "2021-01-04T13:23:23+00:00"
         }
     ],
@@ -123,5 +134,5 @@
     "prefer-lowest": false,
     "platform": [],
     "platform-dev": [],
-    "plugin-api-version": "1.1.0"
+    "plugin-api-version": "2.0.0"
 }

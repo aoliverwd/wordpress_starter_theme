@@ -7,10 +7,14 @@
     const theme_path = __DIR__.'/';
     const include_path = __DIR__.'/includes/';
     const parts_path = __DIR__.'/parts/';
-    const compiled_assets_path = __DIR__.'/cached/';
     const blocks_path = __DIR__.'/blocks/';
     const admin_path = __DIR__.'/admin/';
     const assets_path = __DIR__.'/assets/';
+    const pagination_chunk_posts_per_page = 12;
+    const pagination_chunk_pages = 4;
+
+    /** Set definitions */
+    define('compiled_assets_path', (defined('ABSPATH') ? ABSPATH : __DIR__.'/').'cached/');
 
     /** Global array of static assets that are loaded */
     $GLOBALS['theme_settings_id'] = [];
@@ -24,6 +28,9 @@
     include_once include_path.'wp-actions.php';
     include_once include_path.'wp-shortcodes.php';
     include_once include_path.'block-patterns.php';
+
+    /** Register custom post types */
+    Functions\custom_post_type('system_pages', 'System Pages');
 
     /** Is WordPress administration area */
     if(is_admin()){

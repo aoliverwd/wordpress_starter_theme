@@ -185,9 +185,15 @@
 
     /** return cached filename */
     function check_for_cached_version(string $identifier):string{
-        if(is_dir(Theme\compiled_assets_path)){
 
-            $compiled_path = Theme\compiled_assets_path;
+        if(!is_dir(compiled_assets_path)){
+            mkdir(compiled_assets_path);
+        }
+
+
+        if(is_dir(compiled_assets_path)){
+
+            $compiled_path = compiled_assets_path;
             $compile_index_file = $compiled_path.'compile-index.json';
             $compile_index = (file_exists($compile_index_file) ? json_decode(file_get_contents($compile_index_file), true) : []);
 
@@ -324,5 +330,198 @@
 
             return json_decode(json_encode($nav_items), true);
         }
+    }
+
+    //return image meta
+    function return_image_meta(int $image_id){
+        if($image_id !== 0 && $image_meta = wp_get_attachment_metadata($image_id)){
+            $upload_dir = wp_get_upload_dir();
+            $image_post = get_post($image_id);
+            $image_meta['alt'] = get_post_meta($image_id, '_wp_attachment_image_alt', true);
+            $image_meta['caption'] = $image_post->post_excerpt;
+            $image_meta['description'] = $image_post->post_content;
+            $image_meta['upload_path'] = str_replace(get_site_url(), '', $upload_dir['baseurl']).'/';
+            $image_meta['image_url'] = $image_meta['upload_path'].$image_meta['file'];
+            $image_meta['html'] = '<img src="'.$image_meta['image_url'].'" width="'.$image_meta['width'].'" height="'.$image_meta['height'].'" alt="'.$image_meta['alt'].'" loading="auto">';
+            return $image_meta;
+        }
+    }
+
+    //post page pagination
+    function post_pagination(array $posts = [], bool $is_query = false){
+
+        if($posts) {
+
+            //current page ID
+            //$selectPage = (isset($_GET[$this::pagination_page_query]) && strlen($_GET[$this::pagination_page_query]) > 0 ? intval($_GET[$this::pagination_page_query]) : 1);
+            $selectPage = (get_query_var('paged') > 0 ? get_query_var('paged') : 1);
+
+            $selectPage = ($is_query && isset($_GET['pge']) ? intval($_GET['pge']) : $selectPage);
+
+
+            $pagination = [];
+
+            //chunk posts into x number per chunk
+            foreach(array_chunk($posts, pagination_chunk_posts_per_page) as $thisPage){
+                $pagination[] = [
+                    'id' => count($pagination) + 1,
+                    'addclass' => '',
+                    'each' => [
+                        'posts' => $thisPage
+                    ]
+                ];
+            }
+
+            //current posts chunk from selected page
+            $page_posts = (isset($pagination[$selectPage -1]) ? $pagination[$selectPage -1]['each']['posts'] : $posts);
+
+            //add class
+            if(isset($pagination[$selectPage -1])){
+                $pagination[$selectPage -1]['addclass'] = 'active_container';
+            } else {
+                $pagination[0]['addclass'] = 'active_container';
+            }
+
+            //page to pagination index
+            $pagination_index = [];
+
+            //chunk post chunks into grouped chunks
+            foreach($pagi_chunk = array_chunk($pagination, pagination_chunk_pages) as $chunk_id => $chunk_value){
+                foreach($chunk_value as $this_page){
+                    $pagination_index[$this_page['id']] = $chunk_id;
+                }
+            }
+
+            //block count
+            $block_count = count($pagi_chunk) -1;
+
+            $prev_page = false;
+            $next_page = false;
+
+
+            //is page in first block
+            if(!isset($pagination_index[$selectPage]) || $pagination_index[$selectPage] === 0){
+                $next_page = $selectPage + 1;
+                $next_page = (isset($pagination_index[$selectPage+1]) ? $next_page : false);
+                $pagination = $pagi_chunk[0];
+
+                //is not first page
+                $prev_page = ($next_page > 0 ? $selectPage -1 : false);
+
+            } else if($pagination_index[$selectPage] === $block_count){
+                //is page in last block
+                $prev_page = $selectPage - 1;
+                $prev_page = (isset($pagination_index[$prev_page]) ? $prev_page : false);
+                $pagination = $pagi_chunk[count($pagi_chunk) -1];
+
+                //is not last page
+                $next_page = ($selectPage < count($pagination_index) ? $selectPage + 1 : false);
+
+            } else {
+                //what block is page in
+                $pagination = (isset($pagi_chunk[$pagination_index[$selectPage]]) ? $pagi_chunk[$pagination_index[$selectPage]] : []);
+                $next_page = $selectPage + 1;
+                $prev_page = $selectPage - 1;
+            }
+
+
+            $current_pagination_block_id = $pagination_index[$selectPage];
+            $previous_pagination_block_id = $pagination_index[$selectPage] - 1;
+            $next_pagination_block_id = $pagination_index[$selectPage] + 1;
+
+            $next_pagi = (isset($pagi_chunk[$next_pagination_block_id]) ? $pagi_chunk[$next_pagination_block_id][0]['id'] : false);
+            $prev_pagi = (isset($pagi_chunk[$previous_pagination_block_id]) ? $pagi_chunk[$previous_pagination_block_id][count($pagi_chunk[$previous_pagination_block_id]) - 1]['id'] : false);
+
+            return [
+                'previous_pagination_id' => $prev_pagi,
+                'next_pagination_id' => $next_pagi,
+                'previous_page' => $prev_page,
+                'pagination' => $pagination,
+                'next_page' => $next_page,
+                'posts' => $page_posts
+            ];
+
+        }
+
+        return [
+            'previous_pagination_id' => false,
+            'next_pagination_id' => false,
+            'previous_page' => false,
+            'next_page' => false,
+            'pagination' => [],
+            'posts' => []
+        ];
+    }
+
+    //share this buttons
+    function share_this_post(int $this_post_id = 0, string $type = 'twitter'){
+        if($this_post_id && $this_post = get_post($this_post_id)){
+
+            $post_thumb = urlencode(get_the_post_thumbnail_url($this_post->ID, "medium"));
+            $excerpt = urlencode(strtok(wordwrap($this_post->post_excerpt, 137, "...\n"), "\n"));
+            $post_link = urlencode(get_permalink($this_post->ID));
+
+            switch($type){
+            case 'twitter':
+                return "https://twitter.com/intent/tweet?url=".$post_link."&text=".$excerpt;
+                break;
+            case 'facebook':
+                return "https://www.facebook.com/sharer/sharer.php?u=".$post_link;
+                break;
+            case 'pinterest':
+                return "http://pinterest.com/pin/create/button/?url=".$post_link."&media=".$post_thumb."&description=".$excerpt;
+                break;
+            case 'whatsapp':
+                return "whatsapp://send?text=".$post_link.'" data-action="share/whatsapp/share"';
+                break;
+            }
+        }
+    }
+
+    //register custom post types
+    function custom_post_type(string $name, string $title, bool $hasCategorys = false, bool $revisions = true){
+        $cats = [];
+        $revisions = '';
+
+        if($hasCategorys){ $cats = array('category', 'post_tag'); }
+        if($revisions){$revisions = 'revisions'; }
+
+        register_post_type(
+            $name,
+            array(
+                 'labels'             =>
+                 array(
+                     'name'               => $title,
+                     'singular_name'      => $title,
+                     'add_new'            => 'Add New',
+                     'add_new_item'       => 'Add New '.$title,
+                     'edit_item'          => 'Edit '.$title,
+                     'new_item'           => 'New '.$title,
+                     'all_items'          => 'All '.$title,
+                     'view_item'          => 'View '.$title,
+                     'search_items'       => 'Search '.$title,
+                     'not_found'          => 'No '.$title.' found',
+                     'not_found_in_trash' => 'No '.$title.' found in Trash',
+                     'parent_item_colon'  => '',
+                     'menu_name'          => $title
+                 ),
+                 'taxonomies' => $cats,
+                 'public'             => true,
+                 'publicly_queryable' => true,
+                 'show_ui'            => true,
+                 'show_in_menu'       => true,
+                 'query_var'          => true,
+                 'rewrite'            => array( 'slug' => $name ),
+                 'capability_type'    => 'page',
+                 'has_archive'        => false,
+                 'hierarchical'       => false,
+                 'menu_position'      => NULL,
+                 'show_in_rest'       => true,
+                 'supports'           =>
+                 array(
+                     'title', 'editor', 'author', 'page-attributes', 'thumbnail', 'excerpt', $revisions
+                 )
+            )
+        );
     }
 ?>
