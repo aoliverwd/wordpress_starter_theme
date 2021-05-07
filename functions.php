@@ -3,7 +3,6 @@
     namespace Theme;
 
     /** Set theme constants */
-    const theme_settings_id = 'wT5jP2qU5nJ5rY4tT7h';
     const theme_path = __DIR__.'/';
     const include_path = __DIR__.'/includes/';
     const parts_path = __DIR__.'/parts/';
@@ -15,6 +14,7 @@
 
     /** Set definitions */
     define('compiled_assets_path', (defined('ABSPATH') ? ABSPATH : __DIR__.'/').'cached/');
+    define('theme_settings_id', hash('crc32b', AUTH_KEY.NONCE_KEY.NONCE_SALT));
 
     /** Global array of static assets that are loaded */
     $GLOBALS['theme_settings_id'] = [];

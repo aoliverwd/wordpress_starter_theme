@@ -9,7 +9,7 @@
 
     /** Return theme settings */
     // function return_theme_settings(){
-    //     if($theme_settings = get_option(Theme\theme_settings_id)){
+    //     if($theme_settings = get_option(theme_settings_id)){
     //         return json_decode($theme_settings, true);
     //     }
     // }
@@ -105,9 +105,9 @@
             }
         }
 
-        if(file_exists($asset_file) && !isset($GLOBALS[Theme\theme_settings_id][$asset_file])){
+        if(file_exists($asset_file) && !isset($GLOBALS[theme_settings_id][$asset_file])){
             /** Add to global loaded asset array */
-            $GLOBALS[Theme\theme_settings_id][$asset_file] = true;
+            $GLOBALS[theme_settings_id][$asset_file] = true;
 
             /** Get filesize in KB */
             $file_kb = number_format(filesize($asset_file) / 1024, 2);
