@@ -268,9 +268,8 @@
         if(is_array($block) && isset($block['blockName']) && $block['blockName']){
 
             $blocks_classes = (isset($block['attrs']['className']) ? explode(' ', $block['attrs']['className']) : []);
-            $blocks_class_id = (count($blocks_classes) > 0 && strlen($blocks_classes[0]) > 0 ? Theme\Theme\blocks_path.trim($blocks_classes[0]).'/block.php' : false);
+            $blocks_class_id = (count($blocks_classes) > 0 && strlen($blocks_classes[0]) > 0 ? Theme\blocks_path.trim($blocks_classes[0]).'/block.php' : false);
             $default_block = (file_exists($blocks_class_id) ? $blocks_class_id : false);
-
 
             $block['block_id'] = str_replace('/', '-', $block['blockName']);
             $block_name_ids = explode('/', $block['blockName']);
