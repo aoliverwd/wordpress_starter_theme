@@ -30,4 +30,29 @@
     }
 
     add_action('admin_head', 'Theme\Actions\gutenberg_admin_styles');
+
+    /** Add Reusable blocks to WP administration navigation */
+    add_action('admin_menu', 'Theme\Actions\blocks_menu_item');
+
+    function blocks_menu_item(){
+        add_menu_page(
+            'Reusable Block',
+            'Reusable Blocks',
+            'edit_posts',
+            'edit.php?post_type=wp_block',
+            '',
+            'dashicons-editor-insertmore',
+            59
+        );
+    }
+
+    /** Redirect WP search to /search */
+    function new_search_url() {
+        if (is_search() && ! empty($_GET['s'])){
+            wp_redirect(home_url("/search/").urlencode(get_query_var('s')));
+            exit();
+        }
+    }
+
+    add_action('template_redirect', 'Theme\Actions\new_search_url');
 ?>

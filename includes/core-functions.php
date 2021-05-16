@@ -478,7 +478,7 @@
     }
 
     //register custom post types
-    function custom_post_type(string $name, string $title, bool $hasCategorys = false, bool $revisions = true){
+    function custom_post_type(string $name, string $title, bool $hasCategorys = false, bool $revisions = true, string $dash_icon = 'dashicons-media-default'){
         $cats = [];
         $revisions = '';
 
@@ -516,6 +516,7 @@
                  'hierarchical'       => false,
                  'menu_position'      => NULL,
                  'show_in_rest'       => true,
+                 'menu_icon'          => $dash_icon,
                  'supports'           =>
                  array(
                      'title', 'editor', 'author', 'page-attributes', 'thumbnail', 'excerpt', $revisions

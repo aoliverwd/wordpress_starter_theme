@@ -30,7 +30,11 @@
     include_once include_path.'block-patterns.php';
 
     /** Register custom post types */
-    Functions\custom_post_type('system_pages', 'System Pages');
+    Functions\custom_post_type(
+        name: 'system_pages',
+        title: 'System Pages',
+        dash_icon: 'dashicons-admin-page'
+    );
 
     /** Is WordPress administration area */
     if(is_admin()){
