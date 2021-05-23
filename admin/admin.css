@@ -1,0 +1,70 @@
+:root{
+  --tioggle_foreground: #fff;
+  --tioggle_background_inactive: #acacac;
+  --tioggle_background_active: #54ce54;
+}
+
+.toggle_switch {
+  font-weight: lighter;
+  border-radius: 18px;
+  position: relative;
+  overflow: hidden;
+  cursor: pointer;
+  margin: 20px 0;
+  display: block;
+  height: 34px;
+  width: 75px;
+}
+
+.slider:before {
+  background-color: var(--tioggle_foreground);
+  transition: transform ease 200ms;
+  transform: translateY(-50%);
+  border-radius: 50%;
+  position: absolute;
+  opacity: 0.9;
+  height: 26px;
+  content: "";
+  width: 26px;
+  left: 4px;
+  top: 50%;
+}
+
+.slider:after {
+  transform:translateY(-50%);
+  color: var(--tioggle_foreground);
+  position: absolute;
+  content: "OFF";
+  right: 10px;
+  top: 50%;
+}
+
+.toggle_switch input {
+  opacity: 0;
+  height: 0;
+  width: 0;
+}
+
+.toggle_switch .slider {
+  background-color: var(--tioggle_background_inactive);
+  transition: background ease 200ms;
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  left: 0;
+  top: 0;
+}
+
+input:checked + .slider:before {
+  transform: translate(calc(100% + 14px), -50%);
+}
+
+input:checked + .slider:after {
+  content: "ON";
+  right: auto;
+  left: 10px;
+}
+
+input:checked + .slider {
+  background-color: var(--tioggle_background_active);
+}
