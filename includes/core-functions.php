@@ -50,6 +50,13 @@
             case 'js':
                 array_push($asset_types['js'], $this_asset);
                 break;
+            default:
+                // Movie asset to cached path
+                if(file_exists($this_asset)){
+                    $new_file_name = compiled_assets_path.basename($this_asset);
+                    copy($this_asset, $new_file_name);
+                }
+
             }
         }
 
@@ -127,10 +134,10 @@
             } else {
                 switch($extension){
                 case '.css':
-                    $asset_file = '<link rel="stylesheet" href="'.return_file_uri_path($asset_file).'">';
+                    $asset_file = '<link rel="stylesheet" href="'.return_file_uri_path($asset_file, compiled_assets_path).'">';
                     break;
                 case '.js':
-                    '<script src="'.return_file_uri_path($asset_file).'" defer></script>';
+                    '<script src="'.return_file_uri_path($asset_file, compiled_assets_path).'" defer></script>';
                     break;
                 }
             }
@@ -142,10 +149,11 @@
     }
 
     /** Return file URI path */
-    function return_file_uri_path(string $file_name):string{
+    function return_file_uri_path(string $file_name, string $asset_folder = ''):string{
 
-        /** Get WP content dir name */
-        $content_dir = explode('/', WP_CONTENT_DIR);
+        /** Get WP content DIR name */
+        $content_dir = (!$asset_folder ? explode('/', WP_CONTENT_DIR) : explode('/', $asset_folder));
+        $content_dir = array_filter($content_dir);
         $content_dir_name = array_pop($content_dir);
 
         /** URI relative path */
@@ -233,6 +241,8 @@
             /** Return compiled file filename */
             return $filename;
         }
+
+        return '';
     }
 
     /** Load section */
